@@ -30,6 +30,10 @@ struct ContentView: View {
     @State private var gestureProgress: CGFloat = .zero
 
     @State private var haptics: Bool = false
+    
+    // Drag state for notch repositioning
+    @State private var isDragging = false
+    @State private var dragOffset: CGFloat = 0
 
     @Namespace var albumArtNamespace
 
@@ -187,6 +191,35 @@ struct ContentView: View {
                 ? .black.opacity(0.2) : .clear, radius: Defaults[.cornerRadiusScaling] ? 6 : 4
         )
         .background(dragDetector)
+        .gesture(
+            Defaults[.enableNotchDrag] ?
+            DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    if !isDragging {
+                        isDragging = true
+                    }
+                    // Immediate real-time window positioning
+                    updateWindowPosition(offset: value.translation.width)
+                }
+                .onEnded { value in
+                    let savedOffset = Defaults[.notchHorizontalOffset]
+                    let totalOffset = savedOffset + value.translation.width
+                    
+                    // Get screen bounds to clamp offset
+                    if let screen = NSScreen.screens.first(where: { $0.localizedName == vm.screen }) {
+                        let maxOffset = (screen.frame.width - vm.closedNotchSize.width) / 2
+                        let clamped = max(-maxOffset, min(maxOffset, totalOffset))
+                        Defaults[.notchHorizontalOffset] = clamped
+                        
+                        // Final position adjustment
+                        NotificationCenter.default.post(name: Notification.Name("repositionNotchWindow"), object: nil)
+                    }
+                    
+                    isDragging = false
+                    dragOffset = 0
+                }
+            : nil
+        )
         .environmentObject(vm)
     }
 
@@ -291,6 +324,31 @@ struct ContentView: View {
             .blur(radius: abs(gestureProgress) > 0.3 ? min(abs(gestureProgress), 8) : 0)
             .opacity(abs(gestureProgress) > 0.3 ? min(abs(gestureProgress * 2), 0.8) : 1)
         }
+    }
+    
+    private func updateWindowPosition(offset: CGFloat) {
+        // Don't update if we're not actually dragging to prevent conflicts
+        guard isDragging else { return }
+        
+        let savedOffset = Defaults[.notchHorizontalOffset]
+        let totalOffset = savedOffset + offset
+        
+        // Get the current window more efficiently
+        guard let window = NSApplication.shared.keyWindow ?? NSApplication.shared.windows.first(where: {
+            $0.isVisible && $0.contentView != nil
+        }) else { return }
+        
+        guard let screen = NSScreen.screens.first(where: { $0.localizedName == vm.screen }) else { return }
+        
+        let screenFrame = screen.frame
+        let newX = screenFrame.origin.x + (screenFrame.width / 2) - window.frame.width / 2 + totalOffset
+        
+        // Clamp to screen bounds during drag for immediate feedback
+        let maxOffset = (screenFrame.width - window.frame.width) / 2
+        let clampedX = max(screenFrame.origin.x, min(screenFrame.origin.x + screenFrame.width - window.frame.width, newX))
+        
+        // Use immediate positioning without dispatch for real-time updates
+        window.setFrameOrigin(NSPoint(x: clampedX, y: window.frame.origin.y))
     }
 
     @ViewBuilder
