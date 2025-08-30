@@ -144,6 +144,8 @@ struct GeneralSettings: View {
     @Default(.automaticallySwitchDisplay) var automaticallySwitchDisplay
     @Default(.enableGestures) var enableGestures
     @Default(.openNotchOnHover) var openNotchOnHover
+    @Default(.enableNotchDrag) var enableNotchDrag
+    @Default(.notchHorizontalOffset) var notchHorizontalOffset
 
     var body: some View {
         Form {
@@ -174,6 +176,29 @@ struct GeneralSettings: View {
                     .disabled(showOnAllDisplays)
             } header: {
                 Text("System features")
+            }
+
+            Section {
+                Toggle("Enable notch drag", isOn: $enableNotchDrag)
+                Text("This feature is suitable for notchless MacBooks. Allows you to drag the notch horizontally on the menubar.\n\nThe notch will remain centered if this is off.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom, 2)
+                if enableNotchDrag {
+                    HStack {
+                        Button("Reset Notch Position") {
+                            notchHorizontalOffset = 0
+                        }
+                        .buttonStyle(.bordered)
+                        .help("Reset the notch to the center of the menubar.")
+                        Spacer()
+                        Text("Current offset: \(Int(notchHorizontalOffset)) px")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Notch Drag (Beta)")
             }
 
             Section {
