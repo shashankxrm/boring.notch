@@ -292,11 +292,12 @@ struct ContentView: View {
                           // Old sneak peek music
                           else if coordinator.sneakPeek.type == .music {
                               if vm.notchState == .closed && !vm.hideOnClosed && Defaults[.sneakPeekStyles] == .standard {
-                                  HStack(alignment: .center) {
+                                  HStack(alignment: .center, spacing: 8) {
                                       Image(systemName: "music.note")
-                                      GeometryReader { geo in
-                                          MarqueeText(.constant(musicManager.songTitle + " - " + musicManager.artistName),  textColor: Defaults[.playerColorTinting] ? Color(nsColor: musicManager.avgColor).ensureMinimumBrightness(factor: 0.6) : .gray, minDuration: 1, frameWidth: geo.size.width)
-                                      }
+                                          .frame(width: 20)
+                                      // Increased horizontal space for music title with auto-scroll
+                                      MarqueeText(.constant(musicManager.songTitle + " - " + musicManager.artistName),  textColor: Defaults[.playerColorTinting] ? Color(nsColor: musicManager.avgColor).ensureMinimumBrightness(factor: 0.6) : .gray, minDuration: 0.8, frameWidth: 300)
+                                          .frame(maxWidth: 300)
                                   }
                                   .foregroundStyle(.gray)
                                   .padding(.bottom, 10)
@@ -409,8 +410,8 @@ struct ContentView: View {
                                 .constant(musicManager.songTitle),
                                 textColor: Defaults[.coloredSpectrogram]
                                     ? Color(nsColor: musicManager.avgColor) : Color.gray,
-                                minDuration: 0.4,
-                                frameWidth: 100
+                                minDuration: 1,
+                                frameWidth: 300
                             )
                             .opacity(
                                 (coordinator.expandingView.show && Defaults[.enableSneakPeek]
@@ -436,7 +437,7 @@ struct ContentView: View {
                     width: (coordinator.expandingView.show
                         && coordinator.expandingView.type == .music && Defaults[.enableSneakPeek]
                         && Defaults[.sneakPeekStyles] == .inline)
-                        ? 380 : vm.closedNotchSize.width + (isHovering ? 8 : 0))
+                        ? 450 : vm.closedNotchSize.width + (isHovering ? 8 : 0))
 
             HStack {
                 if useMusicVisualizer {

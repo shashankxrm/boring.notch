@@ -136,10 +136,13 @@ class BoringViewCoordinator: ObservableObject {
     }
 
     func toggleSneakPeek(
-        status: Bool, type: SneakContentType, duration: TimeInterval = 1.5, value: CGFloat = 0,
+        status: Bool, type: SneakContentType, duration: TimeInterval? = nil, value: CGFloat = 0,
         icon: String = ""
     ) {
-        sneakPeekDuration = duration
+        // Set duration based on type if not explicitly provided
+        let actualDuration = duration ?? (type == .music ? 5.0 : 1.5)
+        print("🐛 [DEBUG] toggleSneakPeek called with status: \(status), type: \(type), duration: \(actualDuration)")
+        sneakPeekDuration = actualDuration
         if type != .music {
             // close()
             if !hudReplacement {
@@ -166,14 +169,17 @@ class BoringViewCoordinator: ObservableObject {
     // Helper function to manage sneakPeek timer using Swift Concurrency
     private func scheduleSneakPeekHide(after duration: TimeInterval) {
         sneakPeekTask?.cancel()
+        
+        print("🐛 [DEBUG] Scheduling sneak peek hide after \(duration) seconds")
 
         sneakPeekTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(duration))
             guard let self = self, !Task.isCancelled else { return }
+            print("🐛 [DEBUG] Sneak peek timer expired, hiding sneak peek")
             await MainActor.run {
                 withAnimation {
                     self.toggleSneakPeek(status: false, type: .music)
-                    self.sneakPeekDuration = 1.5
+                    self.sneakPeekDuration = 1.5 // Reset to default HUD duration
                 }
             }
         }
@@ -211,10 +217,13 @@ class BoringViewCoordinator: ObservableObject {
         didSet {
             if expandingView.show {
                 expandingViewTask?.cancel()
-                let duration: TimeInterval = (expandingView.type == .download ? 2 : 3)
+                // Music gets 5 seconds, downloads get 2 seconds, other HUDs get default 3 seconds
+                let duration: TimeInterval = (expandingView.type == .download ? 2 : (expandingView.type == .music ? 5.0 : 1.5))
+                print("🐛 [DEBUG] Scheduling expanding view hide after \(duration) seconds for type: \(expandingView.type)")
                 expandingViewTask = Task { [weak self] in
                     try? await Task.sleep(for: .seconds(duration))
                     guard let self = self, !Task.isCancelled else { return }
+                    print("🐛 [DEBUG] Expanding view timer expired, hiding expanding view")
                     self.toggleExpandingView(status: false, type: .battery)
                 }
             } else {

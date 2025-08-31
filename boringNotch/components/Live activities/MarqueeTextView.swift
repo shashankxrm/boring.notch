@@ -52,7 +52,7 @@ struct MarqueeText: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                HStack(spacing: 20) {
+                HStack(spacing: 40) {
                     Text(text)
                     Text(text)
                         .opacity(needsScrolling ? 1 : 0)
@@ -64,7 +64,7 @@ struct MarqueeText: View {
                 .offset(x: self.animate ? offset : 0)
                 .animation(
                     self.animate ?
-                        .linear(duration: Double(textSize.width / 30))
+                        .linear(duration: Double(textSize.width / 25))
                         .delay(minDuration)
                         .repeatForever(autoreverses: false) : .none,
                     value: self.animate
@@ -78,7 +78,7 @@ struct MarqueeText: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.01){
                         if needsScrolling {
                             self.animate = true
-                            self.offset = -(textSize.width + 10)
+                            self.offset = -(textSize.width + 20)
                             
                         }
                     }
