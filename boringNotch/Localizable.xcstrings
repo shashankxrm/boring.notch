@@ -8230,6 +8230,9 @@
         }
       }
     },
+    "Clipboard is empty" : {
+
+    },
     "Close" : {
       "localizations" : {
         "af" : {
@@ -8727,6 +8730,9 @@
           }
         }
       }
+    },
+    "Current offset: %lld px" : {
+
     },
     "Custom height" : {
       "localizations" : {
@@ -12001,6 +12007,9 @@
           }
         }
       }
+    },
+    "Enable notch drag" : {
+
     },
     "Enable sneak peek" : {
       "localizations" : {
@@ -22608,6 +22617,9 @@
         }
       }
     },
+    "Notch Drag (Beta)" : {
+
+    },
     "Notch Height" : {
       "localizations" : {
         "af" : {
@@ -25417,6 +25429,12 @@
           }
         }
       }
+    },
+    "Reset Notch Position" : {
+
+    },
+    "Reset the notch to the center of the menubar." : {
+
     },
     "Restart" : {
       "localizations" : {
@@ -29047,6 +29065,9 @@
           }
         }
       }
+    },
+    "This feature is suitable for notchless MacBooks. Allows you to drag the notch horizontally on the menubar.\n\nThe notch will remain centered if this is off." : {
+
     },
     "Time to Full Charge: %lld min" : {
       "localizations" : {

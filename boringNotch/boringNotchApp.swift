@@ -141,9 +141,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.async { [weak window] in
             guard let window = window else { return }
             let screenFrame = screen.frame
+            let horizontalOffset = Defaults[.enableNotchDrag] ? Defaults[.notchHorizontalOffset] : 0
             window.setFrameOrigin(
                 NSPoint(
-                    x: screenFrame.origin.x + (screenFrame.width / 2) - window.frame.width / 2,
+                    x: screenFrame.origin.x + (screenFrame.width / 2) - window.frame.width / 2 + horizontalOffset,
                     y: screenFrame.origin.y + screenFrame.height - window.frame.height
                 ))
             window.alphaValue = 1
@@ -165,6 +166,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             forName: Notification.Name.selectedScreenChanged, object: nil, queue: nil
         ) { [weak self] _ in
             self?.adjustWindowPosition(changeAlpha: true)
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name("repositionNotchWindow"), object: nil, queue: nil
+        ) { [weak self] _ in
+            self?.adjustWindowPosition()
         }
 
         NotificationCenter.default.addObserver(

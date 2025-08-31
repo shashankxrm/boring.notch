@@ -161,4 +161,8 @@ extension Defaults.Keys {
             return .nowPlaying
         }
     }
+
+    // MARK: Notch Drag
+    static let enableNotchDrag = Key<Bool>("enableNotchDrag", default: false)
+    static let notchHorizontalOffset = Key<CGFloat>("notchHorizontalOffset", default: 0)
 }
