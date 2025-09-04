@@ -31,8 +31,6 @@ struct ContentView: View {
 
     @State private var haptics: Bool = false
     
-    @StateObject private var clipboardMonitor = ClipboardMonitor()
-    
     // Drag state for notch repositioning
     @State private var isDragging = false
     @State private var dragOffset: CGFloat = 0
@@ -319,8 +317,6 @@ struct ContentView: View {
                         NotchHomeView(albumArtNamespace: albumArtNamespace)
                     case .shelf:
                         NotchShelfView()
-                    case .clipboard:
-                        NotchClipboardView(clipboardMonitor: clipboardMonitor)
                     }
                 }
             }
